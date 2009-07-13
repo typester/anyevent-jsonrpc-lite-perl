@@ -1,4 +1,4 @@
-package AnyEvent::JSONRPC::Lite::Server::CondVar;
+package AnyEvent::JSONRPC::Lite::CondVar;
 use Any::Moose;
 
 use AnyEvent;

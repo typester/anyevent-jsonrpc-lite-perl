@@ -1,11 +1,11 @@
-package AnyEvent::JSONRPC::Lite::Server;
+package AnyEvent::JSONRPC::Lite::TCPServer;
 use Any::Moose;
 
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket;
 
-use AnyEvent::JSONRPC::Lite::Server::CondVar;
+use AnyEvent::JSONRPC::Lite::CondVar;
 
 has address => (
     is      => 'ro',
@@ -103,7 +103,7 @@ sub _dispatch {
             $self->_remove_guard( $indicator );
         };
 
-        my $cv = AnyEvent::JSONRPC::Lite::Server::CondVar->new;
+        my $cv = AnyEvent::JSONRPC::Lite::CondVar->new;
         $cv->cb(
             sub { $res_cb->( result => $_[0]->recv ) },
             sub { $res_cb->( error  => $_[0]->recv ) },

@@ -4,12 +4,12 @@ plan tests => 3;
 
 use Test::TCP;
 use AnyEvent::JSONRPC::Lite;
-use AnyEvent::JSONRPC::Lite::Server;
+use AnyEvent::JSONRPC::Lite::TCPServer;
 
 my $port = empty_port;
 
 ## server
-my $server = AnyEvent::JSONRPC::Lite::Server->new( port => $port );
+my $server = AnyEvent::JSONRPC::Lite::TCPServer->new( port => $port );
 $server->reg_cb(
     echo => sub {
         my ($result_cv, $params) = @_;
