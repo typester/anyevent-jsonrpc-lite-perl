@@ -37,13 +37,6 @@ has _callbacks => (
     default => sub { {} },
 );
 
-has _callback_guards => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    default => sub { {} },
-);
-
 no Any::Moose;
 
 sub BUILD {
@@ -100,7 +93,6 @@ sub _dispatch {
                 result => $type eq 'result' ? $result : undef,
                 error  => $type eq 'error'  ? $result : undef,
             });
-            $self->_remove_guard( $indicator );
         };
 
         my $cv = AnyEvent::JSONRPC::Lite::CondVar->new;
@@ -111,8 +103,6 @@ sub _dispatch {
 
         $target ||= sub { shift->error(qq/No such method "$request->{method}" found/) };
         $target->( $cv, $request->{params} );
-
-        $self->_set_guard( $indicator => $cv );
     }
     else {
         # without id parameter, this is notification.
@@ -120,16 +110,6 @@ sub _dispatch {
         $target ||= sub { warn qq/No such method "$request->{method}" found/ };
         $target->(undef, $request->{params});
     }
-}
-
-sub _set_guard {
-    my ($self, $indicator, $cv) = @_;
-    $self->_callback_guards->{ $indicator } = $cv;
-}
-
-sub _remove_guard {
-    my ($self, $indicator) = @_;
-    delete $self->_callback_guards->{ $indicator };
 }
 
 __PACKAGE__->meta->make_immutable;
