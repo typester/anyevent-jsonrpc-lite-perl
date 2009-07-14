@@ -14,7 +14,6 @@ my $server = AnyEvent::JSONRPC::Lite::TCPServer->new( port => $port );
 
 my $waits = [ undef, rand(2), rand(2), rand(2), rand(2) ];
 my $exit = 0;
-my @obj;
 
 $server->reg_cb(
     wait => sub {
@@ -28,15 +27,16 @@ $server->reg_cb(
             cb    => sub {
                 $r->result($wait);
                 if (++$exit >= 4) {
-                    my $w = AnyEvent->timer(
+                    my $w; $w = AnyEvent->timer(
                         after => 0.3,
-                        cb    => sub { $cv->send },
+                        cb    => sub { undef $w; $cv->send },
                     );
-                    push @obj, $w;
+                }
+                else {
+                    undef $w;
                 }
             },
         );
-        push @obj, $w;
     },
 );
 
