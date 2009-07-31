@@ -15,19 +15,20 @@ has address => (
 
 has port => (
     is      => 'ro',
-    isa     => 'Int',
+    isa     => 'Int|Str',
     default => 4423,
-);
-
-has handler => (
-    is  => 'rw',
-    isa => 'AnyEvent::Handle',
 );
 
 has handler_options => (
     is      => 'ro',
     isa     => 'HashRef',
     default => sub { {} },
+);
+
+has _handlers => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
 );
 
 has _callbacks => (
@@ -44,14 +45,14 @@ sub BUILD {
 
     tcp_server $self->address, $self->port, sub {
         my ($fh, $host, $port) = @_;
-        unless ($fh) {
-            warn "Failed to start JSONRPC Server: $!";
-            return;
-        }
-
         my $indicator = "$host:$port";
 
         my $handle = AnyEvent::Handle->new(
+            on_error => sub {
+                my ($h, $fatal, $msg) = @_;
+                $h->destroy;
+                warn 'Server got error ', $msg;
+            },
             %{ $self->handler_options },
             fh => $fh,
         );
@@ -60,7 +61,14 @@ sub BUILD {
                 $self->_dispatch($indicator, @_);
             }),
         });
-        $self->handler( $handle );
+
+        $self->_handlers->[ fileno($fh) ] = $handle;
+    }, sub {
+        my ($fh) = @_;
+        unless ($fh) {
+            warn "Failed to start JSONRPC Server: $!";
+            return;
+        }
     };
 
     $self;
@@ -88,7 +96,7 @@ sub _dispatch {
             my $type   = shift;
             my $result = @_ > 1 ? \@_ : $_[0];
 
-            $self->handler->push_write( json => {
+            $handle->push_write( json => {
                 id     => $id,
                 result => $type eq 'result' ? $result : undef,
                 error  => $type eq 'error'  ? $result : undef,
@@ -102,13 +110,13 @@ sub _dispatch {
         );
 
         $target ||= sub { shift->error(qq/No such method "$request->{method}" found/) };
-        $target->( $cv, $request->{params} );
+        $target->( $cv, @{ $request->{params} || [] } );
     }
     else {
         # without id parameter, this is notification.
         # dispatch to method without cv object.
         $target ||= sub { warn qq/No such method "$request->{method}" found/ };
-        $target->(undef, $request->{params});
+        $target->(undef, @{ $request->{params} || [] });
     }
 }
 

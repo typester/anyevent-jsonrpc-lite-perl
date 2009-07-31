@@ -17,8 +17,7 @@ my $exit = 0;
 
 $server->reg_cb(
     wait => sub {
-        my ($r, $params) = @_;
-        my ($num, $wait) = @$params;
+        my ($r, $num, $wait) = @_;
 
         is( $waits->[$num], $wait, "Num $num will wait for $wait seconds ok");
 

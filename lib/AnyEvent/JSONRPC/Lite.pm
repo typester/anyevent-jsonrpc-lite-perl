@@ -64,6 +64,11 @@ sub BUILD {
             or die "Failed to connect $self->{host}:$self->{port}: $!";
 
         my $handle = AnyEvent::Handle->new(
+            on_error => sub {
+                my ($h, $fatal, $msg) = @_;
+                $h->destroy;
+                warn "Client got error: $msg";
+            },
             %{ $self->handler_options },
             fh => $fh,
         );
@@ -105,7 +110,7 @@ sub _handle_response {
 
     my $d = delete $self->_callbacks->{ $res->{id} };
     unless ($d) {
-        warn qq/Invalid response from server/;
+        warn q/Invalid response from server/;
         return;
     }
 
