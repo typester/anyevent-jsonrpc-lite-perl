@@ -1,4 +1,4 @@
-package AnyEvent::JSONRPC::Lite::TCPServer;
+package AnyEvent::JSONRPC::Lite::Server;
 use Any::Moose;
 
 use AnyEvent;

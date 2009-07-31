@@ -4,13 +4,13 @@ plan tests => 8;
 
 use Test::TCP;
 use AnyEvent::JSONRPC::Lite;
-use AnyEvent::JSONRPC::Lite::TCPServer;
+use AnyEvent::JSONRPC::Lite::Server;
 
 my $port = empty_port;
 
 my $cv = AnyEvent->condvar;
 
-my $server = AnyEvent::JSONRPC::Lite::TCPServer->new( port => $port );
+my $server = AnyEvent::JSONRPC::Lite::Server->new( port => $port );
 
 my $waits = [ undef, rand(2), rand(2), rand(2), rand(2) ];
 my $exit = 0;
