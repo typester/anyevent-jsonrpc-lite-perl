@@ -1,4 +1,4 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
-  0.01  Mon Jul 13 10:32:23 2009
-        - original version
+0.01  2009-07-31T16:43:46+09:00
+      - original version
