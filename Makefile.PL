@@ -2,6 +2,7 @@ use inc::Module::Install;
 name 'AnyEvent-JSONRPC-Lite';
 all_from 'lib/AnyEvent/JSONRPC/Lite.pm';
 
+requires 'Any::Moose';
 requires 'AnyEvent' => '4.80';
 
 test_requires 'Test::More';

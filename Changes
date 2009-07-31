@@ -1,4 +1,7 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.01001 2009-07-31T17:03:44+09:00
+      - added missing prereq: Any::Moose
+
 0.01  2009-07-31T16:43:46+09:00
       - original version
