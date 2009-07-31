@@ -5,8 +5,6 @@ use AnyEvent;
 use AnyEvent::Socket;
 use AnyEvent::Handle;
 
-our $VERSION = '0.01';
-
 has host => (
     is       => 'ro',
     isa      => 'Str',
@@ -139,20 +137,67 @@ __END__
 
 =head1 NAME
 
-AnyEvent::JSONRPC::Lite::Client - Module abstract (<= 44 characters) goes here
+AnyEvent::JSONRPC::Lite::Client - Simple TCP-based JSONRPC client
 
 =head1 SYNOPSIS
 
-  use AnyEvent::JSONRPC::Lite;
-  blah blah blah
+    use AnyEvent::JSONRPC::Lite::Client;
+    
+    my $client = AnyEvent::JSONRPC::Lite::Client->new(
+        host => '127.0.0.1',
+        port => 4423,
+    );
+    
+    my $cv = $client->call('echo', 'foo', 'bar');
+    
+    my $res    = $cv->recv;
+    my $result = $res->{result}; # => ['foo', 'bar']
 
 =head1 DESCRIPTION
 
-Stub documentation for this module was created by ExtUtils::ModuleMaker.
-It looks like the author of the extension was negligent enough
-to leave the stub unedited.
+This module is client part of L<AnyEvent::JSONRPC::Lite>.
 
-Blah blah blah.
+=head1 METHODS
+
+=head2 new (%options)
+
+Create new client object and return it.
+
+    my $client = AnyEvent::JSONRPC::Lite::Client->new(
+        host => '127.0.0.1',
+        port => 4423,
+    );
+
+Available options are:
+
+=over 4
+
+=item host (Required)
+
+Hostname to connect.
+
+=item port (Required)
+
+Port number to connect.
+
+=item handler_options (Optional)
+
+Hashref. This is passed to constructor of L<AnyEvent::Handle> that is used manage connection.
+
+=back
+
+=head2 call ($method, @params)
+
+Call remote method named C<$method> with parameters C<@params>. And return condvar object for response.
+
+    my $cv = $client->call( echo => 'Hello!' );
+    my $res = $cv->recv;
+
+=head2 notify ($method, @params)
+
+Same as call method, but not handle response. This method just notify to server.
+
+    $client->call( echo => 'Hello' );
 
 =head1 AUTHOR
 

@@ -104,7 +104,7 @@ sub _dispatch {
         };
 
         my $cv = AnyEvent::JSONRPC::Lite::CondVar->new;
-        $cv->cb(
+        $cv->_cb(
             sub { $res_cb->( result => $_[0]->recv ) },
             sub { $res_cb->( error  => $_[0]->recv ) },
         );
@@ -122,3 +122,100 @@ sub _dispatch {
 
 __PACKAGE__->meta->make_immutable;
 
+__END__
+
+=head1 NAME
+
+AnyEvent::JSONRPC::Lite::Server - Simple TCP-based JSONRPC server
+
+=head1 SYNOPSIS
+
+    use AnyEvent::JSONRPC::Lite::Server;
+    
+    my $server = AnyEvent::JSONRPC::Lite::Server->new( port => 4423 );
+    $server->reg_cb(
+        echo => sub {
+            my ($res_cv, @params) = @_;
+            $res_cv->result(@params);
+        },
+        sum => sub {
+            my ($res_cv, @params) = @_;
+            $res_cv->result( $params[0] + $params[1] );
+        },
+    );
+
+=head1 DESCRIPTION
+
+This module is server part of L<AnyEvent::JSONRPC::Lite>.
+
+=head1 METHOD
+
+=head1 new (%options)
+
+Create server object, start listening socket, and return object.
+
+    my $server = AnyEvent::JSONRPC::Lite::Server->new(
+        port => 4423,
+    );
+
+Available C<%options> are:
+
+=over 4
+
+=item port (Required)
+
+Listening port.
+
+=item address (Optional)
+
+Bind address. Default to undef: This means server binds all interfaces by default.
+
+=item handler_options (Optional)
+
+Hashref options of L<AnyEvent::Handle> that is used to handle client connections.
+
+=back
+
+=head2 reg_cb (%callbacks)
+
+Register JSONRPC methods.
+
+    $server->reg_cb(
+        echo => sub {
+            my ($res_cv, @params) = @_;
+            $res_cv->result(@params);
+        },
+        sum => sub {
+            my ($res_cv, @params) = @_;
+            $res_cv->result( $params[0] + $params[1] );
+        },
+    );
+
+=head3 callback arguments
+
+JSONRPC callback arguments consists of C<$result_cv>, and request C<@params>.
+
+    my ($result_cv, @params) = @_;
+
+C<$result_cv> is L<AnyEvent::JSONRPC::Lite::CondVar> object.
+Callback must be call C<$result_cv->result> to return result or L<$result_cv->error> to return error.
+
+If L<$result_cv> is not defined, it is notify request, so you don't have to return response. See L<AnyEvent::JSONRPC::Lite::Client> notify method.
+
+C<@params> is same as request parameter.
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2009 by KAYAC Inc.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut
