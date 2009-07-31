@@ -21,30 +21,28 @@ $server->reg_cb(
 my $c1 = AnyEvent::JSONRPC::Lite::Client->new( host => '127.0.0.1', port => $port );
 my $c2 = AnyEvent::JSONRPC::Lite::Client->new( host => '127.0.0.1', port => $port );
 
-my $done = 0;
-
 my $d1 = $c2->call('echo', 'call 1');
 my $d2 = $c2->call('echo', 'call 2');
 
+$cv->begin;
 $d1->cb(sub {
-    $done++;
     is($d1->recv->{result}, 'call 1', 'call 1 ok');
 
     my $d3 = $c1->call('echo', 'call 3');
     $d3->cb(sub {
         is($d3->recv->{result}, 'call 3', 'call 3 ok');
-        $cv->send if ++$done == 4;
+        $cv->end;
     });
 });
 
+$cv->begin;
 $d2->cb(sub {
-    $done++;
     is($d2->recv->{result}, 'call 2', 'call 2 ok');
 
     my $d4 = $c2->call('echo', 'call 4');
     $d4->cb(sub {
         is($d4->recv->{result}, 'call 4', 'call 4 ok');
-        $cv->send if ++$done == 4;
+        $cv->end;
     });
 });
 
