@@ -3,13 +3,11 @@ use Test::Base;
 plan tests => 3;
 
 use Test::TCP;
-use AnyEvent::JSONRPC::Lite::Client;
-use AnyEvent::JSONRPC::Lite::Server;
+use AnyEvent::JSONRPC::Lite;
 
 my $port = empty_port;
 
-## server
-my $server = AnyEvent::JSONRPC::Lite::Server->new( port => $port );
+my $server = jsonrpc_server undef, $port;
 $server->reg_cb(
     echo => sub {
         my ($result_cv, @params) = @_;
@@ -20,13 +18,12 @@ $server->reg_cb(
 );
 
 # client;
-my $client = AnyEvent::JSONRPC::Lite::Client->new(
-    host => '127.0.0.1',
-    port => $port,
-);
+my $client = jsonrpc_client '127.0.0.1', $port;
 
 my $d = $client->call( echo => { foo => 'bar' } );
 my $res = $d->recv;
 
 is_deeply({ foo => 'bar' }, $res->{result}, 'echo response ok');
+
+
 
