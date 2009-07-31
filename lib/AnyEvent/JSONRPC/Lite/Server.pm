@@ -198,9 +198,9 @@ JSONRPC callback arguments consists of C<$result_cv>, and request C<@params>.
     my ($result_cv, @params) = @_;
 
 C<$result_cv> is L<AnyEvent::JSONRPC::Lite::CondVar> object.
-Callback must be call C<$result_cv->result> to return result or L<$result_cv->error> to return error.
+Callback must be call C<<$result_cv->result>> to return result or C<<$result_cv->error>> to return error.
 
-If L<$result_cv> is not defined, it is notify request, so you don't have to return response. See L<AnyEvent::JSONRPC::Lite::Client> notify method.
+If C<$result_cv> is not defined, it is notify request, so you don't have to return response. See L<AnyEvent::JSONRPC::Lite::Client> notify method.
 
 C<@params> is same as request parameter.
 
