@@ -53,6 +53,11 @@ sub BUILD {
                 $h->destroy;
                 warn 'Server got error ', $msg;
             },
+            on_eof => sub {
+                my ($h) = @_;
+                # client disconnected
+                $h->destroy;
+            },
             %{ $self->handler_options },
             fh => $fh,
         );
