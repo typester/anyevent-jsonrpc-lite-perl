@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.02  2009-08-04T21:28:38+09:00
+      - added default on_eof handler to Server for ignoring clean disconnection from client
+
 0.01002 2009-08-02T13:57:19+09:00
       - some document fixes
       - added missing prereq: JSON
