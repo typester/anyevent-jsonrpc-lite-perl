@@ -1,7 +1,7 @@
 use Test::Base;
 use Test::TCP;
 
-plan 'no_plan';
+plan tests => 2;
 
 use AnyEvent::JSONRPC::Lite;
 

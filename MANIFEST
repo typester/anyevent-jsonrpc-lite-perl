@@ -27,6 +27,8 @@ MANIFEST			This list of files
 META.yml
 README
 t/00_compile.t
+t/disconnect.t
+t/disconnect_server.t
 t/mix_request.t
 t/multi_connection.t
 t/simple_echo.t
