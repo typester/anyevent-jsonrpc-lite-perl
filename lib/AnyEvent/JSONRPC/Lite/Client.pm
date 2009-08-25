@@ -1,5 +1,6 @@
 package AnyEvent::JSONRPC::Lite::Client;
 use Any::Moose;
+use Scalar::Util 'weaken';
 
 use AnyEvent;
 use AnyEvent::Socket;
@@ -52,12 +53,17 @@ has _callbacks => (
     default => sub { {} },
 );
 
+has _connection_guard => (
+    is  => 'rw',
+    isa => 'Maybe[Object]',
+);
+
 no Any::Moose;
 
 sub BUILD {
     my $self = shift;
 
-    tcp_connect $self->host, $self->port, sub {
+    my $guard = tcp_connect $self->host, $self->port, sub {
         my ($fh) = @_
             or die "Failed to connect $self->{host}:$self->{port}: $!";
 
@@ -70,6 +76,7 @@ sub BUILD {
             %{ $self->handler_options },
             fh => $fh,
         );
+
         $handle->on_read(sub {
             shift->unshift_read(json => sub {
                 $self->_handle_response( $_[1] );
@@ -82,6 +89,9 @@ sub BUILD {
 
         $self->handler( $handle );
     };
+    weaken $self;
+
+    $self->_connection_guard($guard);
 }
 
 sub call {
