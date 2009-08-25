@@ -1,5 +1,6 @@
 package AnyEvent::JSONRPC::Lite::Server;
 use Any::Moose;
+use Scalar::Util 'weaken';
 
 use AnyEvent;
 use AnyEvent::Handle;
@@ -46,6 +47,7 @@ sub BUILD {
     tcp_server $self->address, $self->port, sub {
         my ($fh, $host, $port) = @_;
         my $indicator = "$host:$port";
+        return unless $self;
 
         my $handle = AnyEvent::Handle->new(
             on_error => sub {
@@ -75,6 +77,7 @@ sub BUILD {
             return;
         }
     };
+    weaken $self;
 
     $self;
 }
