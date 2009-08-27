@@ -55,7 +55,7 @@ has _callbacks => (
 
 has _connection_guard => (
     is  => 'rw',
-    isa => 'Maybe[Object]',
+    isa => 'Guard',
 );
 
 no Any::Moose;

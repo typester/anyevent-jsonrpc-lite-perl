@@ -20,7 +20,8 @@ my $server = tcp_server undef, $port, sub {
     $handle = AnyEvent::Handle->new(
         fh     => $fh,
         on_error => sub {
-            die 'on_error ', $_[2];
+            warn 'Server got: ', $_[2];
+            $state = 'disconnected';
         },
         on_eof => sub {
             $state = 'disconnected';
