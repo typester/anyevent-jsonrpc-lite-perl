@@ -1,5 +1,7 @@
 package AnyEvent::JSONRPC::Lite::Client;
 use Any::Moose;
+
+use Carp;
 use Scalar::Util 'weaken';
 
 use AnyEvent;
@@ -21,6 +23,18 @@ has port => (
 has handler => (
     is  => 'rw',
     isa => 'AnyEvent::Handle',
+);
+
+has on_error => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        return sub {
+            my ($handle, $fatal, $message) = @_;
+            croak sprintf "Client got error: %s", $message;
+        };
+    },
 );
 
 has handler_options => (
@@ -65,13 +79,17 @@ sub BUILD {
 
     my $guard = tcp_connect $self->host, $self->port, sub {
         my ($fh) = @_
-            or die "Failed to connect $self->{host}:$self->{port}: $!";
+            or return
+                $self->on_error->(
+                    undef, 1,
+                    "Failed to connect $self->{host}:$self->{port}: $!",
+                );
 
         my $handle = AnyEvent::Handle->new(
             on_error => sub {
                 my ($h, $fatal, $msg) = @_;
+                $self->on_error->(@_);
                 $h->destroy;
-                warn "Client got error: $msg";
             },
             %{ $self->handler_options },
             fh => $fh,
@@ -122,7 +140,12 @@ sub _handle_response {
         return;
     }
 
-    $d->send($res);
+    if (my $error = $res->{error}) {
+        $d->croak($error);
+    }
+    else {
+        $d->send($res->{result});
+    }
 }
 
 sub notify {
@@ -158,14 +181,53 @@ AnyEvent::JSONRPC::Lite::Client - Simple TCP-based JSONRPC client
         port => 4423,
     );
     
-    my $cv = $client->call('echo', 'foo', 'bar');
+    # blocking interface
+    my $res = $client->call( echo => 'foo bar' )->recv; # => 'foo bar';
     
-    my $res    = $cv->recv;
-    my $result = $res->{result}; # => ['foo', 'bar']
+    # non-blocking interface
+    $client->call( echo => 'foo bar' )->cb(sub {
+        my $res = $_[0]->recv;  # => 'foo bar';
+    });
 
 =head1 DESCRIPTION
 
 This module is client part of L<AnyEvent::JSONRPC::Lite>.
+
+=head2 AnyEvent condvars
+
+The main thing you have to remember is that all the data retrieval methods
+return an AnyEvent condvar, C<$cv>.  If you want the actual data from the
+request, there are a few things you can do.
+
+You may have noticed that many of the examples in the SYNOPSIS call C<recv>
+on the condvar.  You're allowed to do this under 2 circumstances:
+
+=over 4
+
+=item Either you're in a main program,
+
+Main programs are "allowed to call C<recv> blockingly", according to the
+author of L<AnyEvent>.
+
+=item or you're in a Coro + AnyEvent environment.
+
+When you call C<recv> inside a coroutine, only that coroutine is blocked
+while other coroutines remain active.  Thus, the program as a whole is
+still responsive.
+
+=back
+
+If you're not using Coro, and you don't want your whole program to block,
+what you should do is call C<cb> on the condvar, and give it a coderef to
+execute when the results come back.  The coderef will be given a condvar
+as a parameter, and it can call C<recv> on it to get the data.  The final
+example in the SYNOPSIS gives a brief example of this.
+
+Also note that C<recv> will throw an exception if the request fails, so be
+prepared to catch exceptions where appropriate.
+
+Please read the L<AnyEvent> documentation for more information on the proper
+use of condvars.
 
 =head1 METHODS
 
@@ -176,23 +238,37 @@ Create new client object and return it.
     my $client = AnyEvent::JSONRPC::Lite::Client->new(
         host => '127.0.0.1',
         port => 4423,
+        %options,
     );
 
 Available options are:
 
 =over 4
 
-=item host (Required)
+=item host => 'Str'
 
-Hostname to connect.
+Hostname to connect. (Required)
 
-=item port (Required)
+You should set this option to "unix/" if you will set unix socket to port option.
 
-Port number to connect.
+=item port => 'Int | Str'
 
-=item handler_options (Optional)
+Port number or unix socket path to connect. (Required)
 
-Hashref. This is passed to constructor of L<AnyEvent::Handle> that is used manage connection.
+=item on_error => $cb->($handle, $fatal, $message)
+
+Error callback code reference, which is called when some error occured.
+This has same arguments as L<AnyEvent::Handle>, and also act as handler's on_error callback.
+
+Default is just croak.
+
+If you want to set other options to handle object, use handler_options option showed below.
+
+=item handler_options => 'HashRef'
+
+This is passed to constructor of L<AnyEvent::Handle> that is used manage connection.
+
+Default is empty.
 
 =back
 
@@ -202,6 +278,15 @@ Call remote method named C<$method> with parameters C<@params>. And return condv
 
     my $cv = $client->call( echo => 'Hello!' );
     my $res = $cv->recv;
+
+If server returns an error, C<<$cv->recv>> causes croak by using C<<$cv->croak>>. So you can handle this like following:
+
+    my $res;
+    eval { $res = $cv->recv };
+    
+    if (my $error = $@) {
+        # ...
+    }
 
 =head2 notify ($method, @params)
 
@@ -224,5 +309,3 @@ The full text of the license can be found in the
 LICENSE file included with this module.
 
 =cut
-
-

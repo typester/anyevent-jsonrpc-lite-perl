@@ -25,8 +25,7 @@ my $client = AnyEvent::JSONRPC::Lite::Client->new(
     port => $port,
 );
 
-my $d = $client->call( echo => { foo => 'bar' } );
-my $res = $d->recv;
+my $res = $client->call( echo => { foo => 'bar' } )->recv;
 
-is_deeply({ foo => 'bar' }, $res->{result}, 'echo response ok');
+is_deeply({ foo => 'bar' }, $res, 'echo response ok');
 

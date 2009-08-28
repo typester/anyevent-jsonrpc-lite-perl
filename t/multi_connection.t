@@ -26,22 +26,22 @@ my $d2 = $c2->call('echo', 'call 2');
 
 $cv->begin;
 $d1->cb(sub {
-    is($d1->recv->{result}, 'call 1', 'call 1 ok');
+    is($d1->recv, 'call 1', 'call 1 ok');
 
     my $d3 = $c1->call('echo', 'call 3');
     $d3->cb(sub {
-        is($d3->recv->{result}, 'call 3', 'call 3 ok');
+        is($d3->recv, 'call 3', 'call 3 ok');
         $cv->end;
     });
 });
 
 $cv->begin;
 $d2->cb(sub {
-    is($d2->recv->{result}, 'call 2', 'call 2 ok');
+    is($d2->recv, 'call 2', 'call 2 ok');
 
     my $d4 = $c2->call('echo', 'call 4');
     $d4->cb(sub {
-        is($d4->recv->{result}, 'call 4', 'call 4 ok');
+        is($d4->recv, 'call 4', 'call 4 ok');
         $cv->end;
     });
 });

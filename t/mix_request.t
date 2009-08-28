@@ -46,9 +46,9 @@ my $cv2 = $client->call( wait => '2', $waits->[2] );
 my $cv3 = $client->call( wait => '3', $waits->[3] );
 my $cv4 = $client->call( wait => '4', $waits->[4] );
 
-$cv1->cb(sub { is(shift->recv->{result}, $waits->[1], "cv1 waited $waits->[1] seconds ok") });
-$cv2->cb(sub { is(shift->recv->{result}, $waits->[2], "cv2 waited $waits->[2] seconds ok") });
-$cv3->cb(sub { is(shift->recv->{result}, $waits->[3], "cv3 waited $waits->[3] seconds ok") });
-$cv4->cb(sub { is(shift->recv->{result}, $waits->[4], "cv4 waited $waits->[4] seconds ok") });
+$cv1->cb(sub { is(shift->recv, $waits->[1], "cv1 waited $waits->[1] seconds ok") });
+$cv2->cb(sub { is(shift->recv, $waits->[2], "cv2 waited $waits->[2] seconds ok") });
+$cv3->cb(sub { is(shift->recv, $waits->[3], "cv3 waited $waits->[3] seconds ok") });
+$cv4->cb(sub { is(shift->recv, $waits->[4], "cv4 waited $waits->[4] seconds ok") });
 
 $cv->recv;

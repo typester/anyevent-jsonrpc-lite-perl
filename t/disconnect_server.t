@@ -33,7 +33,7 @@ my $client;
     my $d = $client->call( echo => { foo => 'bar' } );
     my $res = $d->recv;
 
-    is_deeply({ foo => 'bar' }, $res->{result}, 'echo response ok');
+    is_deeply({ foo => 'bar' }, $res, 'echo response ok');
 
     undef $server;
 

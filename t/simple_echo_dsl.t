@@ -20,10 +20,9 @@ $server->reg_cb(
 # client;
 my $client = jsonrpc_client '127.0.0.1', $port;
 
-my $d = $client->call( echo => { foo => 'bar' } );
-my $res = $d->recv;
+my $res = $client->call( echo => { foo => 'bar' } )->recv;
 
-is_deeply({ foo => 'bar' }, $res->{result}, 'echo response ok');
+is_deeply({ foo => 'bar' }, $res, 'echo response ok');
 
 
 

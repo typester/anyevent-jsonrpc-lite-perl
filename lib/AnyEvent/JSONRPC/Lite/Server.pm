@@ -1,8 +1,9 @@
 package AnyEvent::JSONRPC::Lite::Server;
 use Any::Moose;
+
+use Carp;
 use Scalar::Util 'weaken';
 
-use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket;
 
@@ -18,6 +19,27 @@ has port => (
     is      => 'ro',
     isa     => 'Int|Str',
     default => 4423,
+);
+
+has on_error => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        return sub {
+            my ($handle, $fatal, $message) = @_;
+            carp sprintf "Server got error: %s", $message;
+        };
+    },
+);
+
+has on_eof => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+    lazy    => 1,
+    default => sub {
+        return sub { };
+    },
 );
 
 has handler_options => (
@@ -47,17 +69,17 @@ sub BUILD {
     tcp_server $self->address, $self->port, sub {
         my ($fh, $host, $port) = @_;
         my $indicator = "$host:$port";
-        return unless $self;
 
         my $handle = AnyEvent::Handle->new(
             on_error => sub {
                 my ($h, $fatal, $msg) = @_;
+                $self->on_error->(@_);
                 $h->destroy;
-                warn 'Server got error ', $msg;
             },
             on_eof => sub {
                 my ($h) = @_;
                 # client disconnected
+                $self->on_eof->(@_);
                 $h->destroy;
             },
             %{ $self->handler_options },
@@ -70,12 +92,6 @@ sub BUILD {
         });
 
         $self->_handlers->[ fileno($fh) ] = $handle;
-    }, sub {
-        my ($fh) = @_;
-        unless ($fh) {
-            warn "Failed to start JSONRPC Server: $!";
-            return;
-        }
     };
     weaken $self;
 
@@ -108,8 +124,9 @@ sub _dispatch {
                 id     => $id,
                 result => $type eq 'result' ? $result : undef,
                 error  => $type eq 'error'  ? $result : undef,
-            });
+            }) if $handle;
         };
+        weaken $handle;
 
         my $cv = AnyEvent::JSONRPC::Lite::CondVar->new;
         $cv->_cb(
@@ -170,15 +187,26 @@ Available C<%options> are:
 
 =over 4
 
-=item port (Required)
+=item port => 'Int | Str'
 
-Listening port.
+Listening port or path to unix socket (Required)
 
-=item address (Optional)
+=item address => 'Str'
 
 Bind address. Default to undef: This means server binds all interfaces by default.
 
-=item handler_options (Optional)
+If you want to use unix socket, this option should be set to "unix/"
+
+=item on_error => $cb->($handle, $fatal, $message)
+
+Error callback which is called when some errors occured.
+This is actually L<AnyEvent::Handle>'s on_error.
+
+=item on_eof => $cb->($handle)
+
+EOF callback. same as L<AnyEvent::Handle>'s on_eof callback.
+
+=item handler_options => 'HashRef'
 
 Hashref options of L<AnyEvent::Handle> that is used to handle client connections.
 
