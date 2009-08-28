@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.10  2009-08-28T20:25:51+09:00
+      - BACKWARD INCOMPATIBLE: client's $cv->recv now just get ->{result} directly.
+                               and just croak when server returns an error by using $cv->croak
+      - added on_error, on_eof callback options to constructor
+      - upgrade documents
+
 0.03002 2009-08-27T16:28:48+09:00
       - remove Guard object isa check, it's not used when Guard module isn't available.
 
