@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.11  2009-09-03T15:23:56+09:00
+      - fix broken pod syntax
+      - some refactoring around result condvar (tokuhirom++)
+
 0.10  2009-08-28T20:25:51+09:00
       - BACKWARD INCOMPATIBLE: client's $cv->recv now just get ->{result} directly.
                                and just croak when server returns an error by using $cv->croak

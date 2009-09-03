@@ -129,10 +129,7 @@ sub _dispatch {
         weaken $handle;
 
         my $cv = AnyEvent::JSONRPC::Lite::CondVar->new;
-        $cv->_cb(
-            sub { $res_cb->( result => $_[0]->recv ) },
-            sub { $res_cb->( error  => $_[0]->recv ) },
-        );
+        $cv->_cb(sub { $res_cb->( $_[0]->recv ) });
 
         $target ||= sub { shift->error(qq/No such method "$request->{method}" found/) };
         $target->( $cv, @{ $request->{params} || [] } );

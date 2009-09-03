@@ -5,29 +5,27 @@ use AnyEvent;
 
 has _cv => (
     is      => 'ro',
-    isa     => 'ArrayRef[AnyEvent::CondVar]',
+    isa     => 'AnyEvent::CondVar',
     default => sub {
-        [AnyEvent->condvar, AnyEvent->condvar],
+        AnyEvent->condvar;
     },
 );
 
 no Any::Moose;
 
 sub _cb {
-    my ($self, $callback, $errback) = @_;
-
-    $self->_cv->[0]->cb($callback);
-    $self->_cv->[1]->cb($errback);
+    my ($self, $cb) = @_;
+    $self->_cv->cb($cb);
 }
 
 sub result {
     my ($self, @result) = @_;
-    $self->_cv->[0]->send(@result);
+    $self->_cv->send( result => @result);
 }
 
 sub error {
     my ($self, @error) = @_;
-    $self->_cv->[1]->send(@error);
+    $self->_cv->send( error => @error);
 }
 
 __PACKAGE__->meta->make_immutable;
