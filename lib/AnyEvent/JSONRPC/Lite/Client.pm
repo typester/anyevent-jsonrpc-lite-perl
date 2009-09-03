@@ -168,6 +168,15 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=encoding utf-8
+
+=begin stopwords
+
+AnyEvent Coro JSONRPC Hostname Str TCP TCP-based
+blockingly condvar condvars coroutine unix
+
+=end stopwords
+
 =head1 NAME
 
 AnyEvent::JSONRPC::Lite::Client - Simple TCP-based JSONRPC client
@@ -257,7 +266,7 @@ Port number or unix socket path to connect. (Required)
 
 =item on_error => $cb->($handle, $fatal, $message)
 
-Error callback code reference, which is called when some error occured.
+Error callback code reference, which is called when some error occurred.
 This has same arguments as L<AnyEvent::Handle>, and also act as handler's on_error callback.
 
 Default is just croak.

@@ -146,6 +146,8 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=for stopwords JSONRPC TCP TCP-based unix Str
+
 =head1 NAME
 
 AnyEvent::JSONRPC::Lite::Server - Simple TCP-based JSONRPC server
@@ -196,7 +198,7 @@ If you want to use unix socket, this option should be set to "unix/"
 
 =item on_error => $cb->($handle, $fatal, $message)
 
-Error callback which is called when some errors occured.
+Error callback which is called when some errors occurred.
 This is actually L<AnyEvent::Handle>'s on_error.
 
 =item on_eof => $cb->($handle)

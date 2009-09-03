@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base 'Exporter';
 
-our $VERSION = '0.11';
+our $VERSION = '0.11001';
 
 our @EXPORT = qw/jsonrpc_client jsonrpc_server/;
 
@@ -32,6 +32,10 @@ sub jsonrpc_server($$) {
 
 __END__
 
+=encoding utf-8
+
+=for stopwords TCP TCP-based JSONRPC RPC
+
 =head1 NAME
 
 AnyEvent::JSONRPC::Lite - Simple TCP-based JSONRPC client/server
@@ -57,7 +61,7 @@ AnyEvent::JSONRPC::Lite - Simple TCP-based JSONRPC client/server
 
 This module provide TCP-based JSONRPC server/client implementation.
 
-L<AnyEvent::JSONRPC::Lite> provide you a couple of export functions that are shotcut of L<AnyEvent::JSONRPC::Lite::Client> and L<AnyEvent::JSONRPC::Lite::Server>.
+L<AnyEvent::JSONRPC::Lite> provide you a couple of export functions that are shortcut of L<AnyEvent::JSONRPC::Lite::Client> and L<AnyEvent::JSONRPC::Lite::Server>.
 One is C<jsonrpc_client> for Client, another is C<jsonrpc_server> for Server.
 
 =head2 WHY I NAMED "Lite" TO THIS MODULE

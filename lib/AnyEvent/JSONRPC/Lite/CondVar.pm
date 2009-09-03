@@ -32,6 +32,8 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=for stopwords condvar
+
 =head1 NAME
 
 AnyEvent::JSONRPC::Lite::CondVar - Condvar object used in AnyEvent::JSONRPC::Lite::Server
