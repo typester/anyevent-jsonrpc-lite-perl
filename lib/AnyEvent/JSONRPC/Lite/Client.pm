@@ -279,7 +279,7 @@ Call remote method named C<$method> with parameters C<@params>. And return condv
     my $cv = $client->call( echo => 'Hello!' );
     my $res = $cv->recv;
 
-If server returns an error, C<<$cv->recv>> causes croak by using C<<$cv->croak>>. So you can handle this like following:
+If server returns an error, C<< $cv->recv >> causes croak by using C<< $cv->croak >>. So you can handle this like following:
 
     my $res;
     eval { $res = $cv->recv };
