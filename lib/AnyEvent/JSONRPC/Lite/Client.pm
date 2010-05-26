@@ -301,7 +301,7 @@ If server returns an error, C<< $cv->recv >> causes croak by using C<< $cv->croa
 
 Same as call method, but not handle response. This method just notify to server.
 
-    $client->call( echo => 'Hello' );
+    $client->notify( echo => 'Hello' );
 
 =head1 AUTHOR
 
