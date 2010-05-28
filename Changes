@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.12  2010-05-28T11:35:58+09:00
+      - fix a documentation bug (tokuhirom++)
+
 0.11001 2009-09-03T17:57:54+09:00
       - fix pod spell and its test (tokuhirom++)
       - depends latest AnyEvent
