@@ -21,6 +21,11 @@ has port => (
     default => 4423,
 );
 
+has server => (
+    is => 'rw',
+    isa => 'Object',
+);
+
 has on_error => (
     is      => 'rw',
     isa     => 'CodeRef',
@@ -66,7 +71,7 @@ no Any::Moose;
 sub BUILD {
     my $self = shift;
 
-    tcp_server $self->address, $self->port, sub {
+    my $server = tcp_server $self->address, $self->port, sub {
         my ($fh, $host, $port) = @_;
         my $indicator = "$host:$port";
 
@@ -93,6 +98,7 @@ sub BUILD {
 
         $self->_handlers->[ fileno($fh) ] = $handle;
     };
+    $self->server($server);
     weaken $self;
 
     $self;
