@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.13  2010-10-31T15:40:21+09:00
+      - preserve guard object to unbind server socket (cho45++)
+
 0.12  2010-05-28T11:35:58+09:00
       - fix a documentation bug (tokuhirom++)
 

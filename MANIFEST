@@ -35,6 +35,7 @@ t/mix_request.t
 t/multi_connection.t
 t/simple_echo.t
 t/simple_echo_dsl.t
+t/unbind.t
 xt/pod.t
 xt/pod_coverage.t
 xt/pod_spell.t
