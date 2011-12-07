@@ -6,13 +6,18 @@ use Test::TCP;
 use AnyEvent::JSONRPC::Lite::Client;
 use AnyEvent::JSONRPC::Lite::Server;
 
+sub rand_sec {
+    my $maxsec = @_;
+    sprintf '%.4f', rand($maxsec);
+}
+
 my $port = empty_port;
 
 my $cv = AnyEvent->condvar;
 
 my $server = AnyEvent::JSONRPC::Lite::Server->new( port => $port );
 
-my $waits = [ undef, rand(2), rand(2), rand(2), rand(2) ];
+my $waits = [ undef, rand_sec(2), rand_sec(2), rand_sec(2), rand_sec(2) ];
 my $exit = 0;
 
 $server->reg_cb(
