@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::JSONRPC::Lite
 
+0.15  2011-12-09T07:06:52+09:00
+      - fix missing dependency: Test::Exception
+
 0.14  2011-12-08T06:54:56+09:00
       - fix that test sometimes fail in 64bit int support environment (RT: #65014)
 

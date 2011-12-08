@@ -9,6 +9,7 @@ recommends 'JSON::XS';
 
 test_requires 'Test::More';
 test_requires 'Test::TCP';
+test_requires 'Test::Exception';
 
 author_tests('xt');
 use_test_base;
