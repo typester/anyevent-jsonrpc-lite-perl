@@ -12,6 +12,8 @@ my $port = empty_port;
 my $state = 'initial';
 
 my $handle;
+my $ready = AnyEvent->condvar;
+
 my $server = tcp_server undef, $port, sub {
     my ($fh) = @_ or die $!;
 
@@ -28,11 +30,25 @@ my $server = tcp_server undef, $port, sub {
         },
         on_read => sub {  },
     );
+}, sub {
+    my $t; $t = AnyEvent->timer(
+        after => 1,
+        cb    => sub {
+            $ready->send;
+            undef $t;
+        },
+    );
 };
+
+$ready->recv;
 
 {
     my $client = jsonrpc_client '127.0.0.1', $port;
     # disconnect soon after leaving this scope
+
+    my $sleep = AnyEvent->condvar;
+    my $t; $t = AnyEvent->timer( after => 1, cb => sub { $sleep->send });
+    $sleep->recv;
 }
 
 my $cv = AnyEvent->condvar;
